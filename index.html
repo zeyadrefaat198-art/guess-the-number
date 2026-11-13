@@ -50,6 +50,8 @@ button {
   <h1>🎯 Guess The Number</h1>
   <p>Choose your difficulty and guess the number!</p>
 
+  <h3 id="highScore">🏆 High Score: 0</h3>
+
   <select id="difficulty">
     <option value="10">Easy (1–10)</option>
     <option value="50">Medium (1–50)</option>
@@ -72,6 +74,11 @@ button {
 <script>
 let number, attempts, maxAttempts, maxNumber, active;
 
+let highScore = Number(localStorage.getItem("highScore")) || 0;
+
+document.getElementById("highScore").textContent =
+  `🏆 High Score: ${highScore}`;
+
 function startGame() {
   maxNumber = Number(document.getElementById("difficulty").value);
   maxAttempts = maxNumber === 10 ? 5 : maxNumber === 50 ? 7 : 10;
@@ -91,6 +98,7 @@ function checkGuess() {
   if (!active) return;
 
   const guess = Number(document.getElementById("guess").value);
+
   if (!Number.isInteger(guess) || guess < 1 || guess > maxNumber) {
     document.getElementById("message").textContent = "Enter a valid number!";
     return;
@@ -102,6 +110,19 @@ function checkGuess() {
   if (guess === number) {
     message.textContent = "🎉 You Win!";
     active = false;
+
+    const score = maxNumber + (maxAttempts - attempts) * 10;
+
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem("highScore", highScore);
+      document.getElementById("highScore").textContent =
+        `🏆 High Score: ${highScore}`;
+      message.textContent = `🎉 You Win! New High Score: ${score}`;
+    } else {
+      message.textContent = `🎉 You Win! Your Score: ${score}`;
+    }
+
   } else if (guess > number) {
     message.textContent = "Too High! ⬇️";
   } else {
